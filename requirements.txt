@@ -1,6 +1,7 @@
 streamlit
 requests
-Pillow
+Pillow==9.5.0
 moviepy==1.0.3
 gTTS
 imageio-ffmpeg
+numpy
