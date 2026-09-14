@@ -1,5 +1,8 @@
 streamlit
 requests
 Pillow
-moviepy
-gTTS
+moviepy==1.0.3
+edge-tts
+numpy
+imageio-ffmpeg
+
