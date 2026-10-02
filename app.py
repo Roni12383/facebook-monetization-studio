@@ -9,20 +9,30 @@ from PIL import Image
 from moviepy.editor import ImageClip, AudioFileClip, concatenate_videoclips
 import edge_tts
 
-st.set_page_config(page_title="FB Monetization - STABLE", layout="wide")
-st.title("✅ STABLE VERSION - All 6 Scenes Work 100%")
-st.success("No more Pexels download error - Uses cinematic drone motion - Still monetizable")
+st.set_page_config(page_title="FB Flooding Story", layout="wide")
+st.title("✅ FIXED VERSION - Flooding Story")
 
 async def make_naija_voice(text, out_path, voice="en-NG-EzinneNeural"):
     comm = edge_tts.Communicate(text, voice, rate="-5%")
     await comm.save(out_path)
 
+def make_voice_safe(text, out_path, voice):
+    # FIX for asyncio.run error
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(make_naija_voice(text, out_path, voice))
+        loop.close()
+    except Exception as e:
+        st.error(f"Voice error: {e}")
+        raise
+
 def get_image(prompt):
-    for _ in range(3): # Retry 3 times
+    for _ in range(4):
         try:
-            url = f"https://image.pollinations.ai/prompt/{requests.utils.quote(prompt)}?width=720&height=1280&seed={random.randint(1,999999)}&nologo=true&enhance=true"
-            r = requests.get(url, timeout=60)
-            if r.status_code == 200 and len(r.content) > 10000:
+            url = f"https://image.pollinations.ai/prompt/{requests.utils.quote(prompt)}?width=720&height=1280&seed={random.randint(1,999999)}&nologo=true"
+            r = requests.get(url, timeout=90)
+            if r.status_code == 200 and len(r.content) > 15000:
                 return Image.open(BytesIO(r.content))
         except:
             continue
@@ -30,82 +40,81 @@ def get_image(prompt):
 
 def build_story(topic, location):
     return [
-        f"Wait till you see what happened in {location}. {topic}. My people, make una watch till end.",
-        f"For many years in {location}, this land na desert. Nothing dey grow. People dey suffer, no food, no water.",
-        f"One farmer for {location} say enough is enough. He remember old secret method wey his grandfather teach am. Method wey no need plenty money.",
-        f"He start small for one corner. People laugh am. But after three months, that corner don turn green. Water don dey stay for ground.",
-        f"Other farmers for {location} see am, dem join am. Now whole community don turn desert to farm. From dry land to green.",
-        f"Today this farm dey feed more than two hundred families for {location}. Real change for Arewa. Follow this page to learn how. Comment where you dey watch from."
+        f"Ku jira ku ga abin da ya faru a {location}. {topic}. My people, kalli har karshe.",
+        f"A {location}, mutane suna zubar da shara a cikin magudanun ruwa. For years, gutter don block.",
+        f"Shara ta toshe hanya. Ruwa ya kasa wucewa - Water no see road to pass again.",
+        f"Can {location}, karamin ruwa ya sa ambaliya ta shiga gida da titi. Flood enter everywhere.",
+        f"Al'umma sun tashi, sun share magudanun. Community clear gutter, sun hana zubar da shara.",
+        f"Yanzu a {location}, ruwa na tafiya da kyau, ambaliya ta daina. Keep our gutter clean, mu kau da ambaliya. Follow for more, ku biyo mu."
     ]
 
-
-topic = st.text_input("Topic", "Sokoto desert turned to green farm")
+topic = st.text_input("Topic", "Flooding caused by dumping refuse in waterways")
 location = st.text_input("Location", "Sokoto")
-voice = st.selectbox("Voice", ["en-NG-EzinneNeural - Ezinne Female VIRAL", "en-NG-AbeoNeural - Abeo Male"])
+voice_opt = st.selectbox("Voice", ["en-NG-EzinneNeural", "en-NG-AbeoNeural"])
 
-if st.button("🎬 GENERATE 3-MIN STABLE (6/6 SCENES)"):
+if st.button("🎬 GENERATE 3-MIN FLOODING VIDEO"):
     scripts = build_story(topic, location)
     clips = []
     progress = st.progress(0)
 
     for i in range(6):
-        st.write(f"--- Creating Scene {i+1}/6 ---")
+        st.write(f"--- Scene {i+1}/6 ---")
+        audio_path = os.path.join(tempfile.gettempdir(), f"stable_audio_{i}.mp3")
+        img_path = os.path.join(tempfile.gettempdir(), f"stable_img_{i}.jpg")
+
         try:
             # 1. Audio
-            audio_path = os.path.join(tempfile.gettempdir(), f"stable_audio_{i}.mp3")
-            asyncio.run(make_naija_voice(scripts[i], audio_path, voice.split(" - ")[0]))
+            make_voice_safe(scripts[i], audio_path, voice_opt)
             audio = AudioFileClip(audio_path)
-            st.write(f"Audio {i+1}: {audio.duration:.1f}s")
 
-            # 2. Image - with unique prompt for each scene
-            scene_types = ["aerial view dry desert", "suffering village people", "old Hausa farmer thinking", "small green plot sprouting", "community farming together", "lush green harvest celebration"]
-            prompt = f"{topic}, {location}, Nigeria, {scene_types[i]}, ultra realistic, cinematic documentary, 8k"
-
-            img = get_image(prompt)
-            if not img:
-                st.error(f"Scene {i+1} image failed, retrying with simpler prompt")
-                img = get_image(f"Nigerian farm {scene_types[i]}")
+            # 2. Image
+            scene_types = [
+                "blocked gutter filled with plastic refuse Nigeria",
+                "people dumping refuse in waterway",
+                "blocked drainage dirty water",
+                "flooded street houses Nigeria rain",
+                "community youths cleaning gutter",
+                "clean flowing waterway after cleaning"
+            ]
+            prompt = f"{location} Nigeria, {scene_types[i]}, ultra realistic, cinematic documentary, 8k, heavy rain"
+            img = get_image(prompt) or get_image(f"Nigeria {scene_types[i]}")
 
             if img:
-                img_path = os.path.join(tempfile.gettempdir(), f"stable_img_{i}.jpg")
                 img.convert("RGB").save(img_path, "JPEG")
 
-                # CINEMATIC DRONE MOTION - This looks like real video movement
-                # Slow zoom + slight move
-                clip = ImageClip(img_path, duration=audio.duration)
-                # Zoom from 1.0 to 1.2 slowly = drone effect
-                def zoom(t):
-                    return 1 + 0.12 * t / audio.duration
+                # FIXED ZOOM - real drone motion
+                def resizing(t):
+                    return 1 + 0.15 * (t / audio.duration)
 
-                clip = clip.resize(zoom).resize((720,1280))
+                clip = ImageClip(img_path, duration=audio.duration)
+                clip = clip.resize(resizing) # only one resize, with time
                 clip = clip.set_audio(audio)
-                clip = clip.set_position(('center','center'))
+                clip = clip.set_position(('center','center')).crop(width=720, height=1280, x_center=clip.w/2, y_center=clip.h/2)
                 clips.append(clip)
-                st.success(f"Scene {i+1} DONE ✅")
+                st.success(f"Scene {i+1} DONE - {audio.duration:.1f}s")
+                audio.close()
             else:
-                st.error(f"Scene {i+1} image totally failed")
+                st.error(f"Scene {i+1} image failed")
 
         except Exception as e:
             st.error(f"Scene {i+1} error: {e}")
+            import traceback; st.code(traceback.format_exc())
 
         progress.progress((i+1)/6)
 
     if len(clips) >= 5:
         st.write("Stitching final video...")
         final = concatenate_videoclips(clips, method="compose")
-        out_path = os.path.join(tempfile.gettempdir(), "FB_STABLE_3MIN.mp4")
-        final.write_videofile(out_path, fps=24, codec='libx264', audio_codec='aac', logger=None, threads=1)
+        out_path = os.path.join(tempfile.gettempdir(), "FLOODING_STORY.mp4")
+        final.write_videofile(out_path, fps=24, codec='libx264', audio_codec='aac', threads=2)
 
         st.balloons()
-        st.success(f"✅ SUCCESS! ALL {len(clips)}/6 SCENES - {final.duration:.0f} seconds - READY FOR FACEBOOK")
+        st.success(f"✅ SUCCESS! {len(clips)}/6 SCENES - {final.duration:.0f}s")
         st.video(out_path)
-
         with open(out_path, "rb") as f:
-            st.download_button(f"⬇️ DOWNLOAD {final.duration:.0f}s VIDEO", f, f"{location}_3MIN_MONETIZABLE.mp4", "video/mp4")
+            st.download_button("⬇ DOWNLOAD VIDEO", f, f"{location}_flooding.mp4", "video/mp4")
 
-        st.info("This version will NEVER fail with ffmpeg error. Cinematic motion + Naija voice = passes Facebook monetization. Post this as Reel.")
-
-        for c in clips:
-            c.close()
+        for c in clips: c.close()
+        final.close()
     else:
-        st.error(f"Only {len(clips)}/6 made. Click again - Pollinations sometimes slow but this version always completes on 2nd try.")
+        st.error(f"Only {len(clips)}/6 made. Try again.")
