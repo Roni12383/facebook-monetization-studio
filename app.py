@@ -30,13 +30,13 @@ def get_image(prompt):
 
 def build_story(topic, location):
     return [
-        f"Wait till you see what happened in {location}. {topic}. My people, make una watch till end.",
-        f"For many years in {location}, this land na desert. Nothing dey grow. People dey suffer, no food, no water.",
-        f"One farmer for {location} say enough is enough. He remember old secret method wey his grandfather teach am. Method wey no need plenty money.",
-        f"He start small for one corner. People laugh am. But after three months, that corner don turn green. Water don dey stay for ground.",
-        f"Other farmers for {location} see am, dem join am. Now whole community don turn desert to farm. From dry land to green.",
-        f"Today this farm dey feed more than two hundred families for {location}. Real change for Arewa. Follow this page to learn how. Comment where you dey watch from."
-    ]
+    f"Wait till you see what happened in {location}. {topic}. My people, make una watch till end.",
+    f"For many years for {location}, people dey dump refuse for inside gutter and waterway. Plastic, nylon, dirty - everything dem dey throw inside.",
+    f"One heavy rain fall for {location} and water no see road to pass. All the refuse don block the waterway finish. Water no fit flow.",
+    f"Na there flood start. Water enter house, enter shop, enter road for {location}. Properties spoil because gutter don block with refuse wey we throw.",
+    f"One community leader for {location} say enough is enough. Dem gather youths, clear all the gutter, comot all refuse. Dem warn say make nobody throw dirty for waterway again.",
+    f"Today flood no dey worry {location} again. Water dey flow well. Real lesson for Arewa. If we stop to dey dump refuse for waterway, we go stop flood. Follow this page to learn more. Comment where you dey watch from."
+]
 
 topic = st.text_input("Topic", "Sokoto desert turned to green farm")
 location = st.text_input("Location", "Sokoto")
